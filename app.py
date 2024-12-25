@@ -1,3 +1,14 @@
+"""
+Flask App Overview
+This is a simple Flask web application that integrates a sentiment-based recommendation model (SentimentRecommender). 
+Flask: Used to create the web application.
+request: Handles incoming HTTP requests (e.g., form data).
+render_template: Renders HTML templates.
+SentimentRecommender: The recommendation model is imported from model.py.
+app: The Flask application object.
+sent_reco_model: Instantiates the recommendation model for use in the app.
+Homepage (/) : Displays the index.html page, where the user can enter their username.
+"""
 from flask import Flask, request, render_template
 from model import SentimentRecommender
 

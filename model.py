@@ -4,6 +4,34 @@ import numpy as np
 
 
 class SentimentRecommender:
+    """
+    The SentimentRecommender class provides personalized product recommendations based on sentiment analysis of user reviews. 
+    It utilizes pre-trained models and prepared data to generate recommendations tailored to a specific user's preferences.
+    Key Attributes
+    Model Paths: Paths to pre-trained models and data files, such as sentiment analysis model, TF-IDF vectorizer, recommendation engine, and cleaned data.
+        best_sentiment_model.pkl
+        tfidf.pkl
+        best_recommendation_model.pkl
+        clean_data.pkl
+    Loaded Models and Data:
+        Sentiment prediction model for classifying reviews as positive or negative.
+        TF-IDF vectorizer for transforming textual reviews into numerical features.
+        Recommendation engine for suggesting products.
+        Cleaned product data with pre-processed reviews.
+    Methods
+    __init__:
+        Initializes and loads all necessary models and data from their respective paths.
+    top5_recommendations(user_name):
+        Generates the top 5 product recommendations for a given user.
+        Steps:
+        Validates the existence of the user in the recommendation dataset.
+        Fetches the top 20 products recommended for the user.
+        Extracts reviews for these products and processes them using the TF-IDF vectorizer.
+        Predicts the sentiment of each review using the sentiment analysis model.
+        Aggregates sentiment data to calculate the percentage of positive reviews for each product.
+        Sorts products by positive sentiment percentage and returns the top 5.
+
+    """
     root_model_path = "models/"
     sentiment_model = "best_sentiment_model.pkl"
     tfidf_vectorizer = "tfidf.pkl"
@@ -37,13 +65,28 @@ class SentimentRecommender:
             # Create a new column to map Positive sentiment to 1 and Negative sentiment to 0. This will allow us to easily summarize the data
             df_top20_products['positive_sentiment'] = df_top20_products['predicted_sentiment'].apply(
                 lambda x: 1 if x == "Positive" else 0)
-            # Create a new dataframe "pred_df" to store the count of positive user sentiments
-            pred_df = df_top20_products.groupby(by='name').sum()
-            pred_df.columns = ['pos_sent_count']
-            # Create a column to measure the total sentiment count
-            pred_df['total_sent_count'] = df_top20_products.groupby(by='name')['predicted_sentiment'].count()
-            # Create a column that measures the % of positive user sentiment for each product review
+            
+            # Groupby product names and calculate sentiment counts
+            pred_df = df_top20_products.groupby('name').agg(
+                pos_sent_count=('positive_sentiment', 'sum'), 
+                total_sent_count=('id', 'size')
+            )
+
+            # Debugging step: Check the shape and columns
+            print(pred_df.shape)  # Check the number of rows and columns
+            print(pred_df.columns)  # Check the column names
+
+            # Handle missing or invalid values
+            pred_df['pos_sent_count'] = pred_df['pos_sent_count'].fillna(0)
+            pred_df['total_sent_count'] = pred_df['total_sent_count'].fillna(0)
+
+            # Now calculate percentage of positive sentiment
             pred_df['post_sent_percentage'] = np.round(pred_df['pos_sent_count'] / pred_df['total_sent_count'] * 100, 2)
+
             # Return top 5 recommended products to the user
             result = list(pred_df.sort_values(by='post_sent_percentage', ascending=False)[:5].index)
             return result
+
+
+
+

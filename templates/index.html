@@ -1,51 +1,140 @@
 <!DOCTYPE html>
-<html >
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title>Model Deployment</title>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-    <style>
-      body {
-        font-family: 'Tangerine', serif;
-        font-size: 28px;
-      }
-    </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentiment-Based Recommendations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Tangerine:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(to right, #a18cd1, #fbc2eb); /* Purple to pink gradient */
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Tangerine', cursive;
+      font-size: 60px;
+      margin-bottom: 20px;
+      color: #4b0082; /* Indigo for emphasis */
+    }
+
+    form {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    label {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    button {
+      background: #6a0dad; /* Purple button */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5a007a; /* Darker purple on hover */
+    }
+
+    .message {
+      color: #ff0037;
+      font-size: 20px;
+      margin-top: 15px;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .styled-table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      font-size: 18px;
+      min-width: 400px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .styled-table thead tr {
+      background-color: #6a0dad; /* Purple header */
+      color: white;
+      text-align: center;
+    }
+
+    .styled-table th,
+    .styled-table td {
+      padding: 12px 15px;
+      text-align: center;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+      background-color: #f7e8ff; /* Light lavender */
+    }
+
+    .styled-table tbody tr:hover {
+      background-color: #e5d4f7; /* Slightly darker lavender */
+    }
+
+    .styled-table tbody tr:last-of-type {
+      border-bottom: 2px solid #6a0dad;
+    }
+  </style>
 </head>
 
-<body align="center" style="background-color:rgba(100,237,184,0.55);">
- <div>
-	<h1 style="text-align:center">Sentiment Based Product Recommendation System</h1>
+<body>
+  <h1>Sentiment-Based Product Recommendation System</h1>
+  <form action="{{ url_for('predict') }}" method="post">
+    <label for="username">Enter the Username and press "Submit" button to get top 5 product recommendations</label>
+    <input type="text" name="username" placeholder="Enter Username" required>
+    <button type="submit">Submit</button>
+  </form>
 
-    <form align="center" action="{{ url_for('predict')}}"method="post">
-                <label for="username">Enter the Username and press "Submit" button to get top 5 product recommendations</label> <br>
-    	<input type="text" style="text-align:center" name="username" placeholder="User Name" required="required" />
-        <br>
+  {% if message_display %}
+  <p class="message">{{ message_display }}</p>
+  {% endif %}
 
-        <button align="center" type="submit" class="btn btn-primary btn-block btn-large">Submit</button>
-
-    </form>
-
-    <p><h1 style="color:#0037ff;font-size:40px;">{{ message_display }}</h1>
-
-     <div>
-       <h1 class="header">Top 5 Recommended Products</h1>
-       <table class="styled-table">
-          <thead>
-             <tr>
-                <th>Product Name</th>
-             </tr>
-          </thead>
-          <tbody>
-            {% for op in output %}
-             <tr>
-                <td>{{op}}</td>
-             </tr>
-            {% endfor %}
-          </tbody>
-       </table>
-    </div>
-
- </div>
+  {% if output %}
+  <div class="results">
+    <h2>Top 5 Recommended Products</h2>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for op in output %}
+        <tr>
+          <td>{{ op }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 </body>
+
 </html>
